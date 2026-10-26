@@ -197,7 +197,7 @@ export default function About() {
                 maxWidth: isMobile ? "100%" : "490px",
               }}
             >
-              A 2026 vocational high school graduate specializing in Artificial
+              A 2027 vocational high school graduate specializing in Artificial
               Intelligence and Data Science, with a passion for frontend
               development and modern UI. Focused on building clean, responsive
               websites with strong visuals to deliver an optimal digital

@@ -44,7 +44,7 @@ const socialLinks = [
     title: 'Instagram',
     user: '@instagram',
     icon: FaInstagram,
-    link: 'https://www.instagram.com/thenotorious_igm/',
+    link: 'https://www.instagram.com/theaviralpant/',
   },
   {
     title: 'Youtube',
@@ -184,7 +184,7 @@ export default function ContactForm() {
 
         {/* LINKEDIN */} 
         <motion.a
-          href="https://www.linkedin.com/in/thenotorious-in/"
+          href="https://www.linkedin.com/in/theaviralpant/"
           target="_blank"
           rel="noopener noreferrer"
           variants={fieldVariants}
