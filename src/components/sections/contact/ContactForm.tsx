@@ -13,9 +13,9 @@ import {
   FaLinkedinIn,
   FaInstagram,
   FaGithub,
-  FaYoutube,
-  FaTiktok,
 } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
+import { SiHackerearth, SiLeetcode } from 'react-icons/si'
 
 const smoothEase: [number, number, number, number] = [
   0.22,
@@ -46,23 +46,32 @@ const socialLinks = [
     icon: FaInstagram,
     link: 'https://www.instagram.com/theaviralpant/',
   },
-  {
-    title: 'Youtube',
-    user: '@youtube',
-    icon: FaYoutube,
-    link: 'https://youtube.com/',
-  },
+
   {
     title: 'Github',
     user: '@github',
     icon: FaGithub,
     link: 'https://github.com/AviralPant',
   },
+
   {
-    title: 'TikTok',
-    user: '@tiktok',
-    icon: FaTiktok,
-    link: 'https://www.tiktok.com/',
+    title: 'X',
+    user: '@x',
+    icon: FaXTwitter,
+    link: 'https://x.com/theaviralpant',
+  },
+
+  {
+    title: 'HackerEarth',
+    user: '@hackerearth',
+    icon: SiHackerearth,
+    link: 'https://www.hackerearth.com/@aviralpant369/',
+  },
+  {
+    title: 'LeetCode',
+    user: '@leetcode',
+    icon: SiLeetcode,
+    link: 'https://leetcode.com/u/batmanwhokills/',
   },
 ]
 
