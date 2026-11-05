@@ -1,20 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { Upload, Heart, Pin } from 'lucide-react'
-import useComments from '@/hooks/useComments'
+import { motion, Variants } from 'framer-motion'
+import { Mail, MessageSquare, Send, User } from 'lucide-react'
+import { createEmailDraftUrl } from '@/lib/openEmailDraft'
 
 const smoothEase: [number, number, number, number] = [0.22, 1, 0.36, 1]
-
-const containerVariants: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.06,
-    },
-  },
-}
 
 const itemVariants: Variants = {
   hidden: {
@@ -32,37 +23,22 @@ const itemVariants: Variants = {
 }
 
 export default function CommentsSection() {
-  const { comments, loading, addComment, likeComment } =
-    useComments()
+  const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null)
 
-  const [name, setName] = useState('')
-  const [comment, setComment] = useState('')
-  const [image, setImage] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const name = String(formData.get('name') || '').trim()
+    const email = String(formData.get('email') || '').trim()
+    const comment = String(formData.get('comment') || '').trim()
 
-  const handleImage = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setImage(file)
-    setPreview(URL.createObjectURL(file))
-  }
-
-  const handleSubmit = async () => {
-    if (!name.trim() || !comment.trim()) return
-
-    await addComment({
-      name,
-      comment,
-      image,
-    })
-
-    setName('')
-    setComment('')
-    setImage(null)
-    setPreview(null)
+    setEmailDraftUrl(
+      createEmailDraftUrl('New portfolio comment', {
+        Name: name,
+        Email: email || 'Not provided',
+        Comment: comment,
+      }),
+    )
   }
 
   return (
@@ -76,177 +52,101 @@ export default function CommentsSection() {
       viewport={{ once: false, amount: 0.2 }}
       className="rounded-[28px] md:rounded-[34px] border border-white/10 bg-white/5 backdrop-blur-xl p-5 md:p-8 h-full"
     >
-      {/* HEADER */}
       <div className="mb-5 md:mb-6">
         <h3 className="text-xl md:text-2xl font-semibold mb-1">
-          Comments
+          Leave a Comment
         </h3>
-
         <p className="text-xs md:text-sm text-white/40">
-          Leave your thoughts here
+          Your comment will be sent privately by email.
         </p>
       </div>
 
-      {/* FORM */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: false }}
-        className="space-y-3 md:space-y-4 mb-5 md:mb-6"
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3 md:space-y-4"
       >
-        <motion.input
+        <motion.div
           variants={itemVariants}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your Name"
-          className="w-full rounded-2xl border border-white/15 bg-black/20 px-4 py-3 md:py-4 outline-none focus:border-white"
-        />
-
-        <motion.textarea
-          variants={itemVariants}
-          rows={4}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Your Comment"
-          className="w-full rounded-2xl border border-white/15 bg-black/20 px-4 py-3 md:py-4 outline-none resize-none focus:border-white"
-        />
-
-        <motion.label
-          variants={itemVariants}
-          className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-3 md:p-4 flex items-center gap-3 cursor-pointer"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false }}
+          className="relative"
         >
-          <Upload size={16} />
-
-          <span className="text-xs md:text-sm text-white/65">
-            Upload Image
-          </span>
-
+          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
           <input
-            hidden
-            type="file"
-            accept="image/*"
-            onChange={handleImage}
+            name="name"
+            autoComplete="name"
+            maxLength={120}
+            required
+            placeholder="Your Name"
+            className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-3 md:py-4 outline-none focus:border-white"
           />
-        </motion.label>
+        </motion.div>
 
-        <AnimatePresence>
-          {preview && (
-            <motion.img
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              src={preview}
-              alt="Preview"
-              className="rounded-2xl h-36 md:h-44 w-full object-cover border border-white/10"
-            />
-          )}
-        </AnimatePresence>
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false }}
+          className="relative"
+        >
+          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+          <input
+            name="email"
+            type="email"
+            autoComplete="email"
+            maxLength={254}
+            placeholder="Your Email (optional)"
+            className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-3 md:py-4 outline-none focus:border-white"
+          />
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false }}
+          className="relative"
+        >
+          <MessageSquare className="absolute left-4 top-4 text-white/40" />
+          <textarea
+            name="comment"
+            rows={5}
+            maxLength={5000}
+            required
+            placeholder="Your Comment"
+            className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-3 md:py-4 outline-none resize-none focus:border-white"
+          />
+        </motion.div>
+
+        {emailDraftUrl && (
+          <div role="status" className="space-y-2 text-sm">
+            <p className="text-white/60">
+              Your comment is ready, but has not been sent yet.
+            </p>
+            <a
+              href={emailDraftUrl}
+              className="inline-flex text-emerald-300 underline underline-offset-4 hover:text-emerald-200"
+            >
+              Open email draft to send your comment
+            </a>
+          </div>
+        )}
 
         <motion.button
+          type="submit"
           variants={itemVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full rounded-2xl py-3 md:py-4 bg-white/10 border border-white/10 transition-all"
+          className="w-full rounded-2xl py-3 md:py-4 bg-white/10 border border-white/10 transition-all flex items-center justify-center gap-2"
         >
-          {loading ? 'Posting...' : 'Post Comment'}
+          <Send size={16} />
+          Send Comment
         </motion.button>
-      </motion.div>
-
-      {/* COMMENTS LIST */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: false }}
-        className="rounded-[24px] md:rounded-[28px] border border-white/10 bg-black/20 p-3 h-[320px] md:h-[420px] overflow-y-auto custom-scroll"
-      >
-        <div className="space-y-3">
-          <AnimatePresence initial={false}>
-            {comments.map((item, i) => (
-              <motion.div
-                key={item.id || i}
-                layout
-                initial={{
-                  opacity: 0,
-                  y: 18,
-                  scale: 0.96,
-                  filter: 'blur(6px)',
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  filter: 'blur(0px)',
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -10,
-                  scale: 0.96,
-                }}
-                transition={{
-                  duration: 0.55,
-                  ease: smoothEase,
-                  layout: {
-                    duration: 0.45,
-                    ease: smoothEase,
-                  },
-                }}
-                className={`rounded-[20px] md:rounded-[24px] border p-3 md:p-4 ${
-                  item.is_pinned
-                    ? 'border-purple-500/30 bg-purple-500/5'
-                    : 'border-white/10 bg-white/[0.03]'
-                }`}
-              >
-                <div className="flex gap-3">
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold shrink-0">
-                    {item.name?.charAt(0)}
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <p className="text-sm font-medium">
-                        {item.name}
-                      </p>
-
-                      {item.is_pinned && (
-                        <div className="flex items-center gap-1 px-2 py-[3px] rounded-full bg-purple-500/15 border border-purple-500/20 text-[10px] text-purple-300">
-                          <Pin size={10} />
-                          PINNED
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-[12px] md:text-[13px] text-white/55">
-                      {item.comment}
-                    </p>
-
-                    {item.image_url && (
-                      <img
-                        src={item.image_url}
-                        alt="Comment"
-                        className="mt-3 rounded-xl w-full max-h-48 md:max-h-56 object-cover border border-white/10"
-                      />
-                    )}
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      likeComment(item.id, item.likes)
-                    }
-                    className="flex items-center gap-1 text-[11px] text-white/40 hover:text-white transition-colors"
-                  >
-                    <Heart size={13} />
-                    {item.likes || 0}
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+      </form>
     </motion.div>
   )
 }

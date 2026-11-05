@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, Variants } from 'framer-motion'
 import {
   Send,
@@ -16,6 +17,7 @@ import {
 } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import { SiHackerearth, SiLeetcode } from 'react-icons/si'
+import { createEmailDraftUrl } from '@/lib/openEmailDraft'
 
 const smoothEase: [number, number, number, number] = [
   0.22,
@@ -76,6 +78,24 @@ const socialLinks = [
 ]
 
 export default function ContactForm() {
+  const [emailDraftUrl, setEmailDraftUrl] = useState<string | null>(null)
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const name = String(formData.get('name') || '').trim()
+    const email = String(formData.get('email') || '').trim()
+    const message = String(formData.get('message') || '').trim()
+
+    setEmailDraftUrl(
+      createEmailDraftUrl('New portfolio contact message', {
+        Name: name,
+        Email: email,
+        Message: message,
+      }),
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -40 }}
@@ -103,7 +123,10 @@ export default function ContactForm() {
       </motion.div>
 
       {/* FORM */}
-      <div className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+      >
         {/* NAME */}
         <motion.div
           variants={fieldVariants}
@@ -116,6 +139,11 @@ export default function ContactForm() {
             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
 
             <input
+              name="name"
+              type="text"
+              autoComplete="name"
+              maxLength={120}
+              required
               placeholder="Your Name"
               className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-4 outline-none transition duration-200 focus:border-white focus:ring-1 focus:ring-white/40"
             />
@@ -134,6 +162,11 @@ export default function ContactForm() {
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
 
             <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              maxLength={254}
+              required
               placeholder="Your Email"
               className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-4 outline-none transition duration-200 focus:border-white focus:ring-1 focus:ring-white/40"
             />
@@ -152,7 +185,10 @@ export default function ContactForm() {
             <MessageSquare className="absolute left-4 top-5 text-white/40" />
 
             <textarea
+              name="message"
               rows={5}
+              maxLength={5000}
+              required
               placeholder="Your Message"
               className="w-full rounded-2xl border border-white/15 bg-black/20 pl-12 pr-4 py-4 outline-none resize-none transition duration-200 focus:border-white focus:ring-1 focus:ring-white/40"
             />
@@ -160,7 +196,22 @@ export default function ContactForm() {
         </motion.div>
 
         {/* BUTTON */}
+        {emailDraftUrl && (
+          <div role="status" className="space-y-2 text-sm">
+            <p className="text-white/60">
+              Your message is ready, but has not been sent yet.
+            </p>
+            <a
+              href={emailDraftUrl}
+              className="inline-flex text-emerald-300 underline underline-offset-4 hover:text-emerald-200"
+            >
+              Open email draft to send your message
+            </a>
+          </div>
+        )}
+
         <motion.button
+          type="submit"
           variants={fieldVariants}
           initial="hidden"
           whileInView="show"
@@ -176,7 +227,7 @@ export default function ContactForm() {
           <Send size={16} />
           Send Message
         </motion.button>
-      </div>
+      </form>
 
       {/* SOCIAL */}
       <div className="border-t border-white/10 pt-5 mt-6">
