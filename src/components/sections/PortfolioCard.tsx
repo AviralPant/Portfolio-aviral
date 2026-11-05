@@ -14,6 +14,7 @@ type Props = {
   id?: string
   image?: string
   live_url?: string
+  github_url?: string
 }
 
 export default function PortfolioCard({
@@ -23,6 +24,7 @@ export default function PortfolioCard({
   id,
   image,
   live_url,
+  github_url,
 }: Props) {
   const router = useRouter()
 
@@ -49,10 +51,25 @@ export default function PortfolioCard({
         {image ? (
           <img
             src={image}
+            alt={`${title} project preview`}
             className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-white/[0.03]" />
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-white/[0.12] via-white/[0.04] to-transparent">
+            <div className="absolute -right-8 -top-12 h-36 w-36 rounded-full border border-white/10" />
+            <div className="absolute -right-2 -top-6 h-24 w-24 rounded-full border border-white/10" />
+            <span className="text-5xl font-semibold tracking-widest text-white/25">
+              {title
+                .split(/\s+/)
+                .map((word) => word[0])
+                .join('')
+                .slice(0, 3)
+                .toUpperCase()}
+            </span>
+            <span className="absolute bottom-3 left-4 text-[10px] font-medium uppercase tracking-[0.2em] text-white/45">
+              Featured project
+            </span>
+          </div>
         )}
       </div>
 
@@ -65,13 +82,14 @@ export default function PortfolioCard({
       </p>
 
       <div className="mt-auto pt-4 flex items-center justify-between">
-        {live_url ? (
+        {live_url || github_url ? (
           <a
-            href={live_url}
+            href={live_url || github_url}
             target="_blank"
+            rel="noreferrer"
             className="flex items-center gap-2 text-[13px] text-white/70 hover:text-white transition-all"
           >
-            Live Demo
+            {live_url ? 'Live Demo' : 'View on GitHub'}
             <ArrowUpRight size={14} />
           </a>
         ) : (

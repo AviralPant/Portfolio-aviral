@@ -17,6 +17,30 @@ const smoothEase: [number, number, number, number] = [
   1,
 ]
 
+const featuredProjects = [
+  {
+    title: 'Drug Detector AI',
+    description:
+      'A real-time AI system for detecting and classifying suspected drugs in images and video.',
+    image_url: '/assets/drug-detector-ai-banner.png',
+    github_url: 'https://github.com/AviralPant/Drug_Detector_ai',
+  },
+  {
+    title: 'NoteNova',
+    description:
+      'A notes-sharing platform with AI support and dedicated student and faculty panels.',
+    image_url: '/assets/notenova-banner.png',
+    github_url: 'https://github.com/AviralPant/NoteNova',
+  },
+  {
+    title: 'C.O.R.V.I.D.',
+    description:
+      'An AI voice assistant with live conversations, visual awareness, and customizable workflows.',
+    image_url: '/assets/corvid-banner.png',
+    github_url: 'https://github.com/AviralPant/C.O.R.V.I.D.',
+  },
+]
+
 export default function PortfolioShowcase() {
   const {
     projects,
@@ -37,9 +61,22 @@ export default function PortfolioShowcase() {
   const [showAllProjects, setShowAllProjects] =
     useState(false)
 
+  const showcaseProjects = [
+    ...featuredProjects,
+    ...projects.filter(
+      (project) =>
+        !featuredProjects.some(
+          (featuredProject) =>
+            featuredProject.title.toLowerCase() ===
+              project.title?.toLowerCase() ||
+            featuredProject.github_url === project.github_url
+        )
+    ),
+  ]
+
   const displayedProjects = showAllProjects
-    ? projects
-    : projects.slice(0, 3)
+    ? showcaseProjects
+    : showcaseProjects.slice(0, 3)
 
   return (
     <>
@@ -160,7 +197,11 @@ export default function PortfolioShowcase() {
                       displayedProjects.map(
                         (item, i) => (
                           <motion.div
-                            key={item.id}
+                            key={
+                              item.id ??
+                              item.github_url ??
+                              `${item.title}-${i}`
+                            }
                             layout
                             initial={{
                               opacity: 0,
@@ -191,6 +232,7 @@ export default function PortfolioShowcase() {
                               }
                               image={item.image_url}
                               live_url={item.live_url}
+                              github_url={item.github_url}
                               id={item.id}
                             />
                           </motion.div>
@@ -201,7 +243,7 @@ export default function PortfolioShowcase() {
 
                 {/* SEE MORE / LESS */}
                 {!loading &&
-                  projects.length > 3 && (
+                  showcaseProjects.length > 3 && (
                     <motion.div
                       layout
                       transition={{
